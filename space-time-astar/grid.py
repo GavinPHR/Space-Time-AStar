@@ -25,7 +25,7 @@ class Grid:
         x_size = (maxx - minx) // grid_size
         y_size = (maxy - miny) // grid_size
         # Initialize the grid, assuming grid is 2D
-        grid = np.zeros([y_size, x_size, 2], dtype=np.uint16)
+        grid = np.zeros([y_size, x_size, 2], dtype=np.int32)
         # Fill the grid in
         y = miny - grid_size / 2
         for i in range(y_size):
@@ -33,7 +33,7 @@ class Grid:
             x = minx - grid_size / 2
             for j in range(x_size):
                 x += grid_size
-                grid[i][j] = np.array([y, x])
+                grid[i][j] = np.array([x, y])
         return grid
 
     '''
