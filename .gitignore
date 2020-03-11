@@ -4,3 +4,6 @@ env/
 .idea/
 dist/
 MANIFEST
+build/
+test.py
+space_time_astar.egg-info/

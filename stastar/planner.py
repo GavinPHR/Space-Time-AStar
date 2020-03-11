@@ -8,9 +8,9 @@ from heapq import heappush, heappop
 import numpy as np
 from scipy.spatial import KDTree
 
-from neighbour_table import NeighbourTable
-from grid import Grid
-from state import State
+from .neighbour_table import NeighbourTable
+from .grid import Grid
+from .state import State
 
 
 # static obstacles must include the boundary
@@ -120,12 +120,4 @@ class Planner:
         return np.array(total_path[::-1])
 
 
-if __name__ == '__main__':
-    grid_size = 1
-    robot_radius = 2
-    start = (2, 2)
-    goal = (50, 50)
-    static_obstacles = [(0, 0), (60, 70)]
-    dynamic_obstacles = {0: [(5, 16)], 1: [(5, 17)], 2: [(5, 18), (11, 20)]}
-    planner = Planner(grid_size, robot_radius, start, goal, static_obstacles, dynamic_obstacles)
-    print(planner.plan())
+
