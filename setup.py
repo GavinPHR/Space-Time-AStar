@@ -1,10 +1,15 @@
-
 from distutils.core import setup
+
+# read the contents of your README file
+from os import path
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
 
 setup(
   name = 'space-time-astar',         # How you named your package folder (MyLib)
-  packages = ['space-time-astar'],   # Chose the same as "name"
-  version = '0.1',      # Start with a small number and increase it with every change you make
+  packages = ['stastar'],   # Chose the same as "name"
+  version = '0.2',      # Start with a small number and increase it with every change you make
   license='MIT',        # Chose a license from here: https://help.github.com/articles/licensing-a-repository
   description = 'A* search algorithm with an added time dimension to deal with dynamic obstacles.',   # Give a short description about your library
   author = 'Haoran Peng',                   # Type in your name
@@ -27,6 +32,8 @@ setup(
     'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
   ],
+  long_description=long_description,
+  long_description_content_type='text/markdown'
 )
 
 # Tutorial at https://medium.com/@joel.barmettler/how-to-upload-your-python-package-to-pypi-65edc5fe9c56

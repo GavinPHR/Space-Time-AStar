@@ -2,3 +2,5 @@ __pycache__
 env/
 .ipynb_checkpoints/
 .idea/
+dist/
+MANIFEST
