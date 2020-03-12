@@ -20,27 +20,18 @@ class Planner:
 
     def __init__(self, grid_size: int,
                        robot_radius: int,
-                       start: Tuple[int, int],
-                       goal: Tuple[int, int],
-                       static_obstacles: List[Tuple[int, int]],
-                       dynamic_obstacles: Dict[int, List[Tuple[int, int]]],
-                       max_iter:int = 10000,
-                       debug = False):
+                       static_obstacles: List[Tuple[int, int]]):
+
         self.grid_size = grid_size
         self.robot_radius = robot_radius
         np_static_obstacles = np.array(static_obstacles)
         self.static_obstacles = KDTree(np_static_obstacles)
-        self.dynamic_obstacles = dict((k, np.array(v)) for k, v in dynamic_obstacles.items())
 
         # Make the grid according to the grid size
         self.grid = Grid(grid_size, np_static_obstacles)
         # Make a lookup table for looking up neighbours of a grid
         self.neighbour_table = NeighbourTable(self.grid.grid)
 
-        self.start = self.grid.snap_to_grid(np.array(start))
-        self.goal = self.grid.snap_to_grid(np.array(goal))
-        self.max_iter = max_iter
-        self.debug = debug
 
     '''
     An admissible and consistent heuristic for A*
@@ -60,18 +51,27 @@ class Planner:
         return self.l2(grid_pos, self.static_obstacles.query(grid_pos)) > self.robot_radius
 
     '''
-    Assume dynamic obstacles are agents with same radius, distance needs to be 2*radius
-    '''
-    def safe_dynamic(self, grid_pos: np.ndarray, time: int) -> bool:
-        return all(self.l2(grid_pos, obstacle) > 2*self.robot_radius
-                   for obstacle in self.dynamic_obstacles.setdefault(time, []))
-
-    '''
     Space-Time A*
     '''
-    def plan(self) -> np.ndarray:
+    def plan(self, start: Tuple[int, int],
+                   goal: Tuple[int, int],
+                   dynamic_obstacles: Dict[int, List[Tuple[int, int]]],
+                   max_iter:int = 1000,
+                   debug:bool = False) -> np.ndarray:
+
+        # Prepare dynamic obstacles
+        dynamic_obstacles = dict((k, np.array(v)) for k, v in dynamic_obstacles.items())
+        # Assume dynamic obstacles are agents with same radius, distance needs to be 2*radius
+        def safe_dynamic(grid_pos: np.ndarray, time: int) -> bool:
+            nonlocal dynamic_obstacles
+            return all(self.l2(grid_pos, obstacle) > 2 * self.robot_radius
+                       for obstacle in dynamic_obstacles.setdefault(time, []))
+
+        start = self.grid.snap_to_grid(np.array(start))
+        goal = self.grid.snap_to_grid(np.array(goal))
+
         # Initialize the start state
-        s = State(self.start, 0, 0, self.h(self.start, self.goal))
+        s = State(start, 0, 0, self.h(start, goal))
 
         open_set = [s]
         closed_set = set()
@@ -80,24 +80,24 @@ class Planner:
         came_from = dict()
 
         iter_ = 0
-        while open_set and iter_ < self.max_iter:
+        while open_set and iter_ < max_iter:
             iter_ += 1
             current_state = open_set[0]  # Smallest element in min-heap
-            if current_state.pos_equal_to(self.goal):
-                if self.debug:
+            if current_state.pos_equal_to(goal):
+                if debug:
                     print('Path found after {0} iterations'.format(iter_))
                 return self.reconstruct_path(came_from, current_state)
 
             closed_set.add(heappop(open_set))
             epoch = current_state.time + 1
             for neighbour in self.neighbour_table.lookup(current_state.pos):
-                neighbour_state = State(neighbour, epoch, current_state.g_score + 1, self.h(neighbour, self.goal))
+                neighbour_state = State(neighbour, epoch, current_state.g_score + 1, self.h(neighbour, goal))
                 # Check if visited
                 if neighbour_state in closed_set:
                     continue
 
                 # Avoid obstacles
-                if not self.safe_static(neighbour) or not self.safe_dynamic(neighbour, epoch):
+                if not self.safe_static(neighbour) or not safe_dynamic(neighbour, epoch):
                     continue
 
                 # Add to open set
@@ -105,9 +105,9 @@ class Planner:
                     came_from[neighbour_state] = current_state
                     heappush(open_set, neighbour_state)
 
-        if self.debug:
+        if debug:
             print('Open set is empty, no path found.')
-        return None
+        return np.array([])
 
     '''
     Reconstruct path from A* search result
