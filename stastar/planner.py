@@ -48,7 +48,8 @@ class Planner:
     Check whether the nearest static obstacle is within radius
     '''
     def safe_static(self, grid_pos: np.ndarray) -> bool:
-        return self.l2(grid_pos, self.static_obstacles.query(grid_pos)) > self.robot_radius
+        _, nn = self.static_obstacles.query(grid_pos)
+        return self.l2(grid_pos, self.static_obstacles.datt[nn]) > self.robot_radius
 
     '''
     Space-Time A*
