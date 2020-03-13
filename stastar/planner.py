@@ -3,7 +3,7 @@
 Author: Haoran Peng
 Email: gavinsweden@gmail.com
 '''
-from typing import Tuple, List, Dict
+from typing import Tuple, List, Dict, Set
 from heapq import heappush, heappop
 import numpy as np
 from scipy.spatial import KDTree
@@ -49,24 +49,24 @@ class Planner:
     '''
     def safe_static(self, grid_pos: np.ndarray) -> bool:
         _, nn = self.static_obstacles.query(grid_pos)
-        return self.l2(grid_pos, self.static_obstacles.datt[nn]) > self.robot_radius
+        return self.l2(grid_pos, self.static_obstacles.data[nn]) > self.robot_radius
 
     '''
     Space-Time A*
     '''
     def plan(self, start: Tuple[int, int],
                    goal: Tuple[int, int],
-                   dynamic_obstacles: Dict[int, List[Tuple[int, int]]],
-                   max_iter:int = 1000,
+                   dynamic_obstacles: Dict[int, Set[Tuple[int, int]]],
+                   max_iter:int = 500,
                    debug:bool = False) -> np.ndarray:
 
         # Prepare dynamic obstacles
-        dynamic_obstacles = dict((k, np.array(v)) for k, v in dynamic_obstacles.items())
+        dynamic_obstacles = dict((k, np.array(list(v))) for k, v in dynamic_obstacles.items())
         # Assume dynamic obstacles are agents with same radius, distance needs to be 2*radius
         def safe_dynamic(grid_pos: np.ndarray, time: int) -> bool:
             nonlocal dynamic_obstacles
             return all(self.l2(grid_pos, obstacle) > 2 * self.robot_radius
-                       for obstacle in dynamic_obstacles.setdefault(time, []))
+                       for obstacle in dynamic_obstacles.setdefault(time, np.array([])))
 
         start = self.grid.snap_to_grid(np.array(start))
         goal = self.grid.snap_to_grid(np.array(goal))
@@ -86,7 +86,7 @@ class Planner:
             current_state = open_set[0]  # Smallest element in min-heap
             if current_state.pos_equal_to(goal):
                 if debug:
-                    print('Path found after {0} iterations'.format(iter_))
+                    print('STA*: Path found after {0} iterations'.format(iter_))
                 return self.reconstruct_path(came_from, current_state)
 
             closed_set.add(heappop(open_set))
@@ -107,7 +107,7 @@ class Planner:
                     heappush(open_set, neighbour_state)
 
         if debug:
-            print('Open set is empty, no path found.')
+            print('STA*: Open set is empty, no path found.')
         return np.array([])
 
     '''
