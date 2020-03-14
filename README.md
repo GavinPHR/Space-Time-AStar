@@ -58,7 +58,9 @@ A `numpy.ndaarray` with shape `(L, 2)` with `L` being the length of the path.
 
 In a nutshell, STA* is normal A* plus a time dimension. See the illustration below.
 
-![alt text][sta*]
+<p align="center">
+  <img width="500" src="./fig/sta*_illustration.png">
+</p>
 
 On the left block, the first agent plans its path and reserve its path through time (with no regard to the second agent).
 
@@ -80,4 +82,3 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 ## License
 [MIT](https://opensource.org/licenses/MIT)
 
-[sta*]: ./fig/sta*_illustration.png "STA* Illustration by David Silver"
