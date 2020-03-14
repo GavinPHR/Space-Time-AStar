@@ -1,4 +1,4 @@
-# Space-Time A*
+# Space-Time A* ![](https://img.shields.io/pypi/v/space-time-astar) ![](https://img.shields.io/badge/python-%3E%3D3.5-blue) ![](https://img.shields.io/github/license/GavinPHR/Space-Time-AStar) 
 
 Space-Time A* (STA*) Search Algorithm with an Additional Time Dimension to Deal with Dynamic Obstacles.
 
