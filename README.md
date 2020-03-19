@@ -37,6 +37,7 @@ Use `Planner`'s `plan()` method:
 plan(start: Tuple[int, int],
      goal: Tuple[int, int],
      dynamic_obstacles: Dict[int, Set[Tuple[int, int]]],
+     semi_dynamic_obstacles:Dict[int, Set[Tuple[int, int]]] = dict(),
      max_iter:int = 500,
      debug:bool = False) -> np.ndarray:
 ```
@@ -44,6 +45,7 @@ plan(start: Tuple[int, int],
 - **start**: Tuple[int, int] - A start coordinate.
 - **goal**: Tuple[int, int] - A goal coordinate.
 - **dynamic_obstacles**: Dict[int, Set[Tuple[int, int]]] - Dynamic obstacles are really other agents reservation in space-time, more details below.
+- **semi_dynamic_obstacles**: Dict[int, Set[Tuple[int, int]]], *optional* - This parameter exist because we have to take the agents that have reached their destinations into account, they are essentially static obstacles from specific times.
 - **max_iter**: int, *optional* - Max iterations of the search. Default to `500`. 
 - **debug**: bool, *optional* - Prints some debug message. Default to `False`.
 
