@@ -13,9 +13,6 @@ from .grid import Grid
 from .state import State
 
 
-# static obstacles must include the boundary
-# kd-tree faster with more obst (>30), slow if less: kd for static, brute for dynamic
-# indexing consisten with opencv
 class Planner:
 
     def __init__(self, grid_size: int,
@@ -57,6 +54,7 @@ class Planner:
     def plan(self, start: Tuple[int, int],
                    goal: Tuple[int, int],
                    dynamic_obstacles: Dict[int, Set[Tuple[int, int]]],
+                   semi_dynamic_obstacles:Dict[int, Set[Tuple[int, int]]] = dict(),
                    max_iter:int = 500,
                    debug:bool = False) -> np.ndarray:
 
@@ -67,6 +65,19 @@ class Planner:
             nonlocal dynamic_obstacles
             return all(self.l2(grid_pos, obstacle) > 2 * self.robot_radius
                        for obstacle in dynamic_obstacles.setdefault(time, np.array([])))
+
+        # Prepare semi-dynamic obstacles, consider them static after specific timestamp
+        semi_dynamic_obstacles = dict((k, np.array(list(v))) for k, v in semi_dynamic_obstacles.items())
+        def safe_semi_dynamic(grid_pos: np.ndarray, time: int) -> bool:
+            nonlocal semi_dynamic_obstacles
+            for timestamp, obstacles in semi_dynamic_obstacles.items():
+                flag = True
+                if time >= timestamp:
+                    flag = all(self.l2(grid_pos, obstacle) > 2 * self.robot_radius for obstacle in obstacles)
+                if not flag:
+                    return False
+            return True
+
 
         start = self.grid.snap_to_grid(np.array(start))
         goal = self.grid.snap_to_grid(np.array(goal))
@@ -98,7 +109,9 @@ class Planner:
                     continue
 
                 # Avoid obstacles
-                if not self.safe_static(neighbour) or not safe_dynamic(neighbour, epoch):
+                if not self.safe_static(neighbour) \
+                   or not safe_dynamic(neighbour, epoch) \
+                   or not safe_semi_dynamic(neighbour, epoch):
                     continue
 
                 # Add to open set
