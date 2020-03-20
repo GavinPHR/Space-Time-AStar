@@ -54,7 +54,7 @@ class Planner:
     def plan(self, start: Tuple[int, int],
                    goal: Tuple[int, int],
                    dynamic_obstacles: Dict[int, Set[Tuple[int, int]]],
-                   semi_dynamic_obstacles:Dict[int, Set[Tuple[int, int]]] = dict(),
+                   semi_dynamic_obstacles:Dict[int, Set[Tuple[int, int]]] = None,
                    max_iter:int = 500,
                    debug:bool = False) -> np.ndarray:
 
@@ -67,7 +67,10 @@ class Planner:
                        for obstacle in dynamic_obstacles.setdefault(time, np.array([])))
 
         # Prepare semi-dynamic obstacles, consider them static after specific timestamp
-        semi_dynamic_obstacles = dict((k, np.array(list(v))) for k, v in semi_dynamic_obstacles.items())
+        if semi_dynamic_obstacles is None:
+            semi_dynamic_obstacles = dict()
+        else:
+            semi_dynamic_obstacles = dict((k, np.array(list(v))) for k, v in semi_dynamic_obstacles.items())
         def safe_semi_dynamic(grid_pos: np.ndarray, time: int) -> bool:
             nonlocal semi_dynamic_obstacles
             for timestamp, obstacles in semi_dynamic_obstacles.items():
