@@ -29,8 +29,7 @@ class NeighbourTable:
 
     @staticmethod
     def hash(grid_pos: np.ndarray) -> int:
-        concat = str(grid_pos[0]) + str(grid_pos[1])
-        return concat
+        return tuple(grid_pos)
 
 if __name__ == '__main__':
     grid = np.array([[[15,5],[15,6],[15,7],[15,8],[15,9]],

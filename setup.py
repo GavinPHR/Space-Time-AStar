@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 setuptools.setup(
   name = 'space-time-astar',         # How you named your package folder (MyLib)
   packages=setuptools.find_packages(),
-  version = '0.7',      # Start with a small number and increase it with every change you make
+  version = '0.8',      # Start with a small number and increase it with every change you make
   license='MIT',        # Chose a license from here: https://help.github.com/articles/licensing-a-repository
   description = 'A* search algorithm with an added time dimension to deal with dynamic obstacles.',   # Give a short description about your library
   author = 'Haoran Peng',                   # Type in your name
