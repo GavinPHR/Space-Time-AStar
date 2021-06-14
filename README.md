@@ -56,7 +56,7 @@ A `numpy.ndaarray` with shape `(L, 2)` with `L` being the length of the path.
 
 ## Theoretical Background
 
-[Here](http://www0.cs.ucl.ac.uk/staff/D.Silver/web/Applications_files/coop-path-AIWisdom.pdf) is a good document about Space-Time A* (STA*) written by David Silver.
+[Here](https://www.davidsilver.uk/wp-content/uploads/2020/03/coop-path-AIWisdom.pdf) is a good document about Space-Time A* (STA*) written by David Silver.
 
 In a nutshell, STA* is normal A* plus a time dimension. See the illustration below.
 
